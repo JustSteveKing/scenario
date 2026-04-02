@@ -10,10 +10,18 @@ use JustSteveKing\Scenario\Contracts\Action;
 use JustSteveKing\Scenario\Contracts\Scenario;
 use JustSteveKing\Scenario\Support\Result;
 
+/**
+ * The Runner is the execution heart of the Scenario engine.
+ *
+ * It iterates through a scenario's `Blueprint` and invokes each `Action`
+ * through the `Resolver`. If a `Result::isFailure()` is returned, the
+ * Runner will halt and initiate the Saga (LIFO) rollback by calling
+ * the `compensate()` method for all previously successful actions.
+ */
 class Runner
 {
     /**
-     * @var array<Action>
+     * @var array<Action> The stack of successfully completed actions for rollback.
      */
     protected array $history = [];
 
@@ -23,6 +31,13 @@ class Runner
         protected Context $context,
     ) {}
 
+    /**
+     * Run the scenario's blueprint steps.
+     *
+     * @param Blueprint $blueprint The sequence of actions and sub-scenarios.
+     * @param mixed $input The initial start-up data for the scenario.
+     * @return Result The final success or failure state of the entire process.
+     */
     public function run(Blueprint $blueprint, mixed $input): Result
     {
         $steps = $blueprint->getSteps();
@@ -77,6 +92,11 @@ class Runner
         return Result::success();
     }
 
+    /**
+     * Execute the Saga rollback in LIFO order.
+     *
+     * @param mixed $input The same input provided during scenario start.
+     */
     protected function compensate(mixed $input): void
     {
         // Saga pattern: trigger compensation in reverse order (LIFO)

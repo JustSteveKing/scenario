@@ -9,6 +9,18 @@ use JustSteveKing\Scenario\Context\Context;
 use ReflectionMethod;
 use ReflectionNamedType;
 
+/**
+ * The Resolver is the orchestration brain of the Scenario engine.
+ *
+ * It uses reflection to dynamically resolve the arguments of an action's
+ * `handle()` method. It follows a strict prioritization strategy:
+ *
+ * 1.  The `Context` object itself if type-hinted.
+ * 2.  The `payload` specifically passed in the blueprint for this step.
+ * 3.  Any object already recorded in the `Context` that matches the type hint.
+ * 4.  The initial `input` if it matches the type hint or is an untyped first parameter.
+ * 5.  The Laravel Service Container for any other type-hinted classes.
+ */
 class Resolver
 {
     public function __construct(
@@ -16,9 +28,13 @@ class Resolver
     ) {}
 
     /**
-     * Resolve and invoke the handle method on the given action.
+     * Resolve the dependencies for an action's `handle()` method and invoke it.
      *
-     * @param array<string, mixed> $payload
+     * @param object $action The instance of the Action being executed.
+     * @param mixed $input The initial data payload passed to the scenario.
+     * @param Context $context The current shared state across all scenario steps.
+     * @param array<string, mixed> $payload Optional configuration defined in the blueprint.
+     * @return mixed The result of the `handle()` invocation.
      */
     public function resolve(object $action, mixed $input, Context $context, array $payload = []): mixed
     {
