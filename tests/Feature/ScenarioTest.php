@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace JustSteveKing\Scenario\Tests\Feature;
 
-use Illuminate\Container\Container;
 use JustSteveKing\Scenario\Context\Context;
 use JustSteveKing\Scenario\Contracts\Action;
 use JustSteveKing\Scenario\Contracts\Scenario as ScenarioContract;
