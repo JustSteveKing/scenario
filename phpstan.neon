@@ -5,6 +5,7 @@ parameters:
     level: 10
     paths:
       - src/
+    tmpDir: .phpstan.cache
 
     parallel:
       maximumNumberOfProcesses: 3
