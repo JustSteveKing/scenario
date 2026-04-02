@@ -29,9 +29,6 @@
     "pint": [
       "./vendor/bin/pint --parallel"
     ],
-    "post-update-cmd": [
-      "@php artisan boost:update --ansi"
-    ],
     "stan": [
       "./vendor/bin/phpstan analyse"
     ],
