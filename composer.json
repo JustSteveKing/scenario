@@ -1,0 +1,39 @@
+{
+  "name": "juststeveking/scenario",
+  "description": "Description goes here.",
+  "require": {
+    "php": "^8.5",
+    "juststeveking/result": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "JustSteveKing\\Scenario\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "JustSteveKing\\Scenario\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "orchestra/testbench": "^11.0",
+    "roave/security-advisories": "dev-latest",
+    "phpstan/phpstan": "^2.1.46",
+    "phpstan/phpstan-strict-rules": "^2.0.10",
+    "laravel/pint": "^1.29"
+  },
+  "scripts": {
+    "lint": [
+      "./vendor/bin/pint --test --parallel"
+    ],
+    "pint": [
+      "./vendor/bin/pint --parallel"
+    ],
+    "stan": [
+      "./vendor/bin/phpstan analyse"
+    ],
+    "test": [
+      "./vendor/bin/phpunit --testdox"
+    ]
+  }
+}

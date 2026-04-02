@@ -1,0 +1,15 @@
+/vendor/
+/.phpunit.cache/
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+/.phpstan.cache/
+/phpstan-baseline.neon
+
+# IDE Files
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+
+# Lock files (common for libraries to ignore)
+composer.lock

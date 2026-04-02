@@ -1,0 +1,23 @@
+* text=auto
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+
+# Folders to ignore when exporting
+/tests export-ignore
+/examples export-ignore
+/.github export-ignore
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/phpstan.neon export-ignore
+/phpunit.xml export-ignore
+/pint.json export-ignore
+/README.md export-ignore
+/GEMINI.md export-ignore
+/composer.json export-ignore
+/composer.lock export-ignore
