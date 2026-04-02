@@ -23,11 +23,23 @@ class PendingScenario
      */
     protected array $middleware = [];
 
+    /**
+     * @var array<int, \Closure(string, \JustSteveKing\Scenario\Support\Result, Context): void>
+     */
+    protected array $stepCallbacks = [];
+
     public function __construct(
         protected Blueprint $blueprint,
         protected Container $container,
     ) {
         $this->context = new Context();
+    }
+
+    public function onStep(\Closure $callback): self
+    {
+        $this->stepCallbacks[] = $callback;
+
+        return $this;
     }
 
     /**
@@ -50,6 +62,7 @@ class PendingScenario
             'resolver' => $resolver,
             'container' => $this->container,
             'context' => $this->context,
+            'stepCallbacks' => $this->stepCallbacks,
         ]);
 
         $pipeline = array_reduce(

@@ -8,6 +8,8 @@ $examples = [
     '03-context-sharing.php',
     '04-middleware.php',
     '05-action-payload.php',
+    '06-logging-middleware.php',
+    '07-on-step.php',
 ];
 
 foreach ($examples as $example) {

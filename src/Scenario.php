@@ -26,6 +26,7 @@ class Scenario
     public static function for(string $scenarioClass): PendingScenario
     {
         $container = IlluminateContainer::getInstance();
+        $container->instance(\Illuminate\Contracts\Container\Container::class, $container);
 
         $blueprint = new Blueprint();
 

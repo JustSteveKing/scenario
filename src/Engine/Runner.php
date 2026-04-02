@@ -25,11 +25,22 @@ class Runner
      */
     protected array $history = [];
 
+    /**
+     * @var array<int, \Closure(string, Result, Context): void>
+     */
+    protected array $stepCallbacks = [];
+
+    /**
+     * @param array<int, \Closure(string, Result, Context): void> $stepCallbacks
+     */
     public function __construct(
         protected Resolver $resolver,
         protected Container $container,
         protected Context $context,
-    ) {}
+        array $stepCallbacks = [],
+    ) {
+        $this->stepCallbacks = $stepCallbacks;
+    }
 
     /**
      * Run the scenario's blueprint steps.
@@ -75,6 +86,7 @@ class Runner
             }
 
             if ($result->isFailure()) {
+                $this->fireStepCallbacks($stepClass, $result);
                 $this->compensate($input);
                 return $result;
             }
@@ -87,9 +99,21 @@ class Runner
             if (is_object($value)) {
                 $this->context->record($value);
             }
+
+            $this->fireStepCallbacks($stepClass, $result);
         }
 
         return Result::success();
+    }
+
+    /**
+     * Invoke all registered step callbacks with the completed action's details.
+     */
+    private function fireStepCallbacks(string $stepClass, Result $result): void
+    {
+        foreach ($this->stepCallbacks as $callback) {
+            $callback($stepClass, $result, $this->context);
+        }
     }
 
     /**
