@@ -42,8 +42,15 @@ class PendingScenario
 
     public function run(mixed $input = null): self
     {
-        $resolver = new Resolver($this->container);
-        $runner = new Runner($resolver, $this->container, $this->context);
+        /** @var Resolver $resolver */
+        $resolver = $this->container->make(Resolver::class);
+
+        /** @var Runner $runner */
+        $runner = $this->container->make(Runner::class, [
+            'resolver' => $resolver,
+            'container' => $this->container,
+            'context' => $this->context,
+        ]);
 
         $pipeline = array_reduce(
             array_reverse($this->middleware),

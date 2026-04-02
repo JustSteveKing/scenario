@@ -87,8 +87,6 @@ class ScenarioTest extends PackageTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Reset container to avoid state bleed
-        Container::setInstance(new Container());
 
         SubAction::$compensated = false;
     }
