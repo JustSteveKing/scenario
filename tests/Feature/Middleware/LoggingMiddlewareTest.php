@@ -58,9 +58,10 @@ class LoggingMiddlewareTest extends PackageTestCase
             ->method('warning')
             ->with(
                 'Scenario failed',
-                $this->callback(fn(array $context) =>
-                    $context['error'] === 'Something went wrong' &&
-                    isset($context['duration_ms'])
+                $this->callback(
+                    fn(array $context)
+                    => $context['error'] === 'Something went wrong'
+                    && isset($context['duration_ms']),
                 ),
             );
 
