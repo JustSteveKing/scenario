@@ -24,6 +24,25 @@ composer require juststeveking/scenario
 
 ---
 
+## Scaffolding (Laravel Only)
+
+Quickly generate boilerplate for your workflows using the built-in Artisan commands:
+
+```bash
+# Create a new Scenario class in app/Scenarios
+php artisan make:scenario Order/PlaceOrderScenario
+
+# Create a new Action class
+php artisan make:scenario-action Order/Actions/ChargePayment
+
+# Create a new Middleware class
+php artisan make:scenario-middleware Order/Middleware/ValidateInventory
+```
+
+The commands will automatically resolve the correct namespaces and create the directories if they don't exist.
+
+---
+
 ## Getting Started
 
 ### 1. Define your Input Data

@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use Closure;
+use JustSteveKing\Scenario\Context\Context;
+use JustSteveKing\Scenario\Contracts\Middleware;
+use JustSteveKing\Scenario\Support\Result;
+
+class {{ class }} implements Middleware
+{
+    /**
+     * Handle the scenario execution.
+     *
+     * @param mixed $input
+     * @param Context $context
+     * @param Closure(mixed, Context): Result $next
+     * @return Result
+     */
+    public function handle(mixed $input, Context $context, Closure $next): Result
+    {
+        return $next($input, $context);
+    }
+}

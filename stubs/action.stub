@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use JustSteveKing\Scenario\Contracts\Action;
+use JustSteveKing\Scenario\Context\Context;
+use JustSteveKing\Scenario\Support\Result;
+
+class {{ class }} implements Action
+{
+    /**
+     * Execute the action.
+     */
+    public function handle(): Result
+    {
+        return Result::success();
+    }
+
+    /**
+     * Revert the action's effects if the scenario fails.
+     */
+    public function compensate(mixed $input, Context $context): void
+    {
+        //
+    }
+}
