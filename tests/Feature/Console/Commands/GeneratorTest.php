@@ -27,7 +27,7 @@ class GeneratorTest extends PackageTestCase
             ->assertExitCode(0);
 
         $path = app_path('Scenarios/ParseRSSFeed/ParserScenario.php');
-        
+
         $this->assertTrue(File::exists($path));
         $this->assertStringContainsString('namespace App\Scenarios\ParseRSSFeed;', File::get($path));
         $this->assertStringContainsString('class ParserScenario implements Scenario', File::get($path));
@@ -40,7 +40,7 @@ class GeneratorTest extends PackageTestCase
             ->assertExitCode(0);
 
         $path = app_path('Scenarios/ParseRSSFeed/Actions/FetchFeed.php');
-        
+
         $this->assertTrue(File::exists($path));
         $this->assertStringContainsString('namespace App\Scenarios\ParseRSSFeed\Actions;', File::get($path));
         $this->assertStringContainsString('class FetchFeed implements Action', File::get($path));
@@ -53,7 +53,7 @@ class GeneratorTest extends PackageTestCase
             ->assertExitCode(0);
 
         $path = app_path('Scenarios/Telemetry/LogScenario.php');
-        
+
         $this->assertTrue(File::exists($path));
         $this->assertStringContainsString('namespace App\Scenarios\Telemetry;', File::get($path));
         $this->assertStringContainsString('class LogScenario implements Middleware', File::get($path));
