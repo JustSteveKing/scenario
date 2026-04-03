@@ -13,19 +13,26 @@ use JustSteveKing\Scenario\Support\Result;
 class DatabaseTransactionMiddleware implements Middleware
 {
     public function __construct(
-        private readonly ConnectionInterface $db,
+        protected ConnectionInterface $connection,
     ) {}
 
     public function handle(mixed $input, Context $context, Closure $next): Result
     {
-        $this->db->beginTransaction();
+        $this->connection->beginTransaction();
 
-        $result = $next($input, $context);
+        try {
+            $result = $next($input, $context);
 
-        $result->isSuccess()
-            ? $this->db->commit()
-            : $this->db->rollBack();
+            if ($result->isFailure()) {
+                $this->connection->rollBack();
+                return $result;
+            }
 
-        return $result;
+            $this->connection->commit();
+            return $result;
+        } catch (\Throwable $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
     }
 }

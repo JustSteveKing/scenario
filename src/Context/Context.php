@@ -41,4 +41,14 @@ class Context
 
         return null;
     }
+
+    /**
+     * Get all objects in the registry.
+     *
+     * @return array<string, object>
+     */
+    public function all(): array
+    {
+        return $this->registry;
+    }
 }

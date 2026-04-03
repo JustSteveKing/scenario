@@ -5,34 +5,41 @@ declare(strict_types=1);
 namespace JustSteveKing\Scenario\Middleware;
 
 use Closure;
-use Psr\Log\LoggerInterface;
 use JustSteveKing\Scenario\Context\Context;
 use JustSteveKing\Scenario\Contracts\Middleware;
 use JustSteveKing\Scenario\Support\Result;
+use Psr\Log\LoggerInterface;
 
 class LoggingMiddleware implements Middleware
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
+        protected LoggerInterface $logger,
     ) {}
 
     public function handle(mixed $input, Context $context, Closure $next): Result
     {
-        $start = hrtime(true);
+        $start = microtime(true);
 
-        $this->logger->info('Scenario started');
+        // Find the anonymous class holding the scenario name
+        $scenarioName = 'Unknown Scenario';
+        foreach ($context->all() as $obj) {
+            if (property_exists($obj, 'value') && str_contains($obj::class, 'anonymous')) {
+                /** @var string $scenarioName */
+                $scenarioName = $obj->value;
+                break;
+            }
+        }
+
+        $this->logger->info("Scenario [{$scenarioName}] started.");
 
         $result = $next($input, $context);
 
-        $elapsed = (hrtime(true) - $start) / 1_000_000;
+        $duration = round((microtime(true) - $start) * 1000, 2);
 
         if ($result->isSuccess()) {
-            $this->logger->info('Scenario completed', ['duration_ms' => $elapsed]);
+            $this->logger->info("Scenario [{$scenarioName}] completed successfully in {$duration}ms.");
         } else {
-            $this->logger->warning('Scenario failed', [
-                'error' => $result->error(),
-                'duration_ms' => $elapsed,
-            ]);
+            $this->logger->warning("Scenario [{$scenarioName}] failed in {$duration}ms. Error: {$result->error()}");
         }
 
         return $result;

@@ -31,15 +31,23 @@ class Runner
     protected array $stepCallbacks = [];
 
     /**
+     * @var array<string, Result>
+     */
+    protected array $mocks = [];
+
+    /**
      * @param array<int, \Closure(string, Result, Context): void> $stepCallbacks
+     * @param array<string, Result> $mocks
      */
     public function __construct(
         protected Resolver $resolver,
         protected Container $container,
         protected Context $context,
         array $stepCallbacks = [],
+        array $mocks = [],
     ) {
         $this->stepCallbacks = $stepCallbacks;
+        $this->mocks = $mocks;
     }
 
     /**
@@ -56,6 +64,36 @@ class Runner
         foreach ($steps as $step) {
             $stepClass = $step['class'];
             $payload = $step['payload'];
+
+            if (isset($this->mocks[$stepClass])) {
+                $result = $this->mocks[$stepClass];
+
+                // Track mock in history if it's an action and it succeeded
+                if ($result->isSuccess()) {
+                    // Try to make instance for history tracking if we can
+                    try {
+                        $instance = $this->container->make($stepClass);
+                        if ($instance instanceof Action) {
+                            $this->history[] = $instance;
+                        }
+                    } catch (\Exception $e) {
+                    }
+
+                    $value = $result->value();
+                    if (is_object($value)) {
+                        $this->context->record($value);
+                    }
+                }
+
+                if ($result->isFailure()) {
+                    $this->fireStepCallbacks($stepClass, $result);
+                    $this->compensate($input);
+                    return $result;
+                }
+
+                $this->fireStepCallbacks($stepClass, $result);
+                continue;
+            }
 
             $instance = $this->container->make($stepClass);
 
@@ -78,18 +116,28 @@ class Runner
             }
 
             // Execute the step via the Resolver, passing the action's specific payload
-            $result = $this->resolver->resolve($instance, $input, $this->context, $payload);
+            try {
+                $result = $this->resolver->resolve($instance, $input, $this->context, $payload);
 
-            if (! $result instanceof Result) {
-                // To maintain strictness, ensure actions return a Result object
-                throw new \RuntimeException(sprintf('Action %s must return a Result object.', $stepClass));
+                if (! $result instanceof Result) {
+                    // To maintain strictness, ensure actions return a Result object
+                    throw new \RuntimeException(sprintf('Action %s must return a Result object.', $stepClass));
+                }
+            } catch (\Illuminate\Contracts\Container\BindingResolutionException|\RuntimeException $e) {
+                // Structural errors should bubble up
+                throw $e;
+            } catch (\Throwable $e) {
+                // Business logic errors should trigger compensation
+                $result = Result::failure($e->getMessage());
             }
 
             if ($result->isFailure()) {
                 $this->fireStepCallbacks($stepClass, $result);
                 $this->compensate($input);
+
                 return $result;
             }
+
 
             // On success, track the step in history
             $this->history[] = $instance;
