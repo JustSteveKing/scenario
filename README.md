@@ -357,16 +357,69 @@ Note the callback signatures:
 
 ---
 
-## Testing
+## Testing Your Scenarios
 
-```bash
-composer test
+The library includes built-in test helpers to make asserting against your workflows fluent and clean.
+
+### 1. Faking Scenarios
+If you're writing a controller test and want to assert that a scenario was triggered without actually executing all of its actions, you can use `Scenario::fake()`.
+
+```php
+use JustSteveKing\Scenario\Scenario;
+
+public function test_it_dispatches_registration_scenario()
+{
+    Scenario::fake();
+
+    $this->post('/register', [
+        'name' => 'John',
+        'email' => 'john@example.com',
+    ]);
+
+    // Assert it ran at all
+    Scenario::assertRan(RegistrationScenario::class);
+
+    // Or assert it ran with specific input
+    Scenario::assertRan(RegistrationScenario::class, function ($input) {
+        return $input->email === 'john@example.com';
+    });
+    
+    Scenario::assertNotRan(DeleteUserScenario::class);
+}
 ```
 
-For static analysis:
+### 2. Fluent Assertions
+When you are unit testing a specific scenario, you can use the fluent assertions to verify the outcome and the final state of the `Context`.
 
-```bash
-composer stan
+```php
+public function test_registration_scenario_succeeds()
+{
+    Scenario::for(RegistrationScenario::class)
+        ->run(new RegisterUserData('John', 'john@example.com'))
+        ->assertPassed()
+        ->assertContextHas(User::class)
+        ->assertContextHas(User::class, fn(User $user) => $user->email === 'john@example.com');
+}
+
+public function test_registration_scenario_fails_on_duplicate_email()
+{
+    Scenario::for(RegistrationScenario::class)
+        ->run(new RegisterUserData('John', 'existing@example.com'))
+        ->assertFailed();
+}
+```
+
+### 3. Action Mocking (Partial Fakes)
+Sometimes you want to test the full orchestration of a scenario, but mock out a single step that talks to an external API (like a Payment Gateway). You can use the `mock()` method to force a specific `Result` for an action.
+
+```php
+public function test_checkout_handles_payment_failure()
+{
+    Scenario::for(CheckoutScenario::class)
+        ->mock(ChargeCreditCard::class, Result::failure("Card declined."))
+        ->run(new CheckoutData())
+        ->assertFailed();
+}
 ```
 
 ---

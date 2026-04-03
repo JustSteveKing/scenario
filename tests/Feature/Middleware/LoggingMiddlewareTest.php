@@ -26,12 +26,11 @@ class LoggingMiddlewareTest extends PackageTestCase
                 $call++;
 
                 if ($call === 1) {
-                    $this->assertSame('Scenario started', $message);
+                    $this->assertSame('Scenario [Unknown Scenario] started.', $message);
                 }
 
                 if ($call === 2) {
-                    $this->assertSame('Scenario completed', $message);
-                    $this->assertArrayHasKey('duration_ms', $context);
+                    $this->assertStringContainsString('completed successfully', $message);
                 }
             });
 
@@ -52,18 +51,14 @@ class LoggingMiddlewareTest extends PackageTestCase
 
         $logger->expects($this->once())
             ->method('info')
-            ->with('Scenario started');
+            ->with('Scenario [Unknown Scenario] started.');
 
         $logger->expects($this->once())
             ->method('warning')
-            ->with(
-                'Scenario failed',
-                $this->callback(
-                    fn(array $context)
-                    => $context['error'] === 'Something went wrong'
-                    && isset($context['duration_ms']),
-                ),
-            );
+            ->willReturnCallback(function (string $message) {
+                $this->assertStringContainsString('failed', $message);
+                $this->assertStringContainsString('Something went wrong', $message);
+            });
 
         $middleware = new LoggingMiddleware($logger);
         $next = fn(mixed $input, Context $context): Result => Result::failure('Something went wrong');

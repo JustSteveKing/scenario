@@ -12,10 +12,16 @@ use JustSteveKing\Scenario\Engine\Blueprint;
 use JustSteveKing\Scenario\Engine\Resolver;
 use JustSteveKing\Scenario\Engine\Runner;
 use JustSteveKing\Scenario\Support\Result;
+use JustSteveKing\Scenario\Testing\Concerns\InteractsWithAssertions;
+use JustSteveKing\Scenario\Testing\Concerns\InteractsWithMocks;
 
 class PendingScenario
 {
+    use InteractsWithAssertions;
+    use InteractsWithMocks;
+
     protected ?Result $result = null;
+
     protected Context $context;
 
     /**
@@ -35,6 +41,18 @@ class PendingScenario
         $this->context = new Context();
     }
 
+    /**
+     * @internal
+     */
+    public function setScenarioClass(string $class): self
+    {
+        $this->context->record(new class ($class) {
+            public function __construct(public string $value) {}
+        });
+
+        return $this;
+    }
+
     public function onStep(\Closure $callback): self
     {
         $this->stepCallbacks[] = $callback;
@@ -43,7 +61,7 @@ class PendingScenario
     }
 
     /**
-     * @param array<class-string<Middleware>> $middleware
+     * @param  array<class-string<Middleware>>  $middleware
      */
     public function through(array $middleware): self
     {
@@ -63,6 +81,7 @@ class PendingScenario
             'container' => $this->container,
             'context' => $this->context,
             'stepCallbacks' => $this->stepCallbacks,
+            'mocks' => $this->mocks,
         ]);
 
         $pipeline = array_reduce(
@@ -71,6 +90,7 @@ class PendingScenario
                 return function (mixed $input, Context $context) use ($next, $middlewareClass): Result {
                     /** @var Middleware $middleware */
                     $middleware = $this->container->make($middlewareClass);
+
                     return $middleware->handle($input, $context, $next);
                 };
             },

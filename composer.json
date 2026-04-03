@@ -1,35 +1,25 @@
 {
   "name": "juststeveking/scenario",
-  "description": "A type-safe, railway-oriented business logic orchestration engine for PHP 8.5+.",
-  "type": "library",
-  "license": "MIT",
+  "description": "A strictly typed, railway-oriented business logic orchestration engine for PHP and Laravel.",
   "keywords": [
     "laravel",
+    "workflow",
     "orchestration",
     "saga",
-    "scenario",
-    "workflow",
-    "business-logic",
-    "railway-oriented"
+    "railway-oriented-programming",
+    "type-safe",
+    "business-logic"
   ],
+  "license": "MIT",
   "authors": [
     {
       "name": "Steve McDougall",
-      "email": "steve@juststeveking.com",
-      "homepage": "https://juststeveking.link/",
-      "role": "Developer"
+      "email": "steve@treblle.com"
     }
   ],
-  "homepage": "https://github.com/JustSteveKing/scenario",
   "require": {
-    "php": "^8.5"
-  },
-  "require-dev": {
-    "laravel/pint": "^1.29",
-    "orchestra/testbench": "^11.0",
-    "phpstan/phpstan": "^2.1.46",
-    "phpstan/phpstan-strict-rules": "^2.0.10",
-    "roave/security-advisories": "dev-latest"
+    "php": "^8.5",
+    "psr/log": "^1.0|^2.0|^3.0"
   },
   "autoload": {
     "psr-4": {
@@ -40,6 +30,13 @@
     "psr-4": {
       "JustSteveKing\\Scenario\\Tests\\": "tests/"
     }
+  },
+  "require-dev": {
+    "orchestra/testbench": "^11.0",
+    "roave/security-advisories": "dev-latest",
+    "phpstan/phpstan": "^2.1.46",
+    "phpstan/phpstan-strict-rules": "^2.0.10",
+    "laravel/pint": "^1.29"
   },
   "scripts": {
     "lint": [
@@ -55,16 +52,11 @@
       "./vendor/bin/phpunit --testdox"
     ]
   },
-  "config": {
-    "sort-packages": true
-  },
   "extra": {
     "laravel": {
       "providers": [
         "JustSteveKing\\Scenario\\Providers\\ScenarioServiceProvider"
       ]
     }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  }
 }
