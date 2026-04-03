@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use JustSteveKing\Scenario\Contracts\Scenario;
+use JustSteveKing\Scenario\Engine\Blueprint;
+
+class {{ class }} implements Scenario
+{
+    /**
+     * Define the business process steps.
+     */
+    public function build(Blueprint $plan): void
+    {
+        // $plan->add(MyAction::class);
+    }
+}
